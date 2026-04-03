@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stock atelier - QR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0b0d10;
+      --bg-alt: #141820;
+      --accent: #00c853;
+      --accent-soft: rgba(0, 200, 83, 0.16);
+      --danger: #ff5252;
+      --text: #e3e7ee;
+      --text-soft: #9aa3b5;
+      --border: #232937;
+      --card-radius: 14px;
+      --transition-fast: 0.18s ease-out;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.55);
+      --shadow-strong: 0 30px 60px rgba(0, 0, 0, 0.75);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1c2736 0, #05070b 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1220px;
+      background: radial-gradient(circle at 0 0, #222b3a 0, #05070b 55%);
+      border-radius: 20px;
+      border: 1px solid rgba(90, 106, 133, 0.4);
+      box-shadow: var(--shadow-strong);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .app-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+          circle at 15% 0%,
+          rgba(0, 200, 83, 0.12),
+          transparent 60%
+        ),
+        radial-gradient(
+          circle at 85% 120%,
+          rgba(0, 200, 160, 0.16),
+          transparent 60%
+        );
+      opacity: 0.85;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: relative;
+      z-index: 1;
+      padding: 16px 20px 8px;
+      border-bottom: 1px solid rgba(56, 68, 94, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 11px;
+      background: radial-gradient(circle at 30% 20%, #00e676, #00c853 50%, #00a143);
+      box-shadow: 0 0 0 1px rgba(0, 200, 83, 0.5),
+        0 12px 25px rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #02150a;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: 0.05em;
+    }
+
+    .brand-text-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .brand-text-sub {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-soft);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tag-pill {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(91, 107, 139, 0.8);
+      color: var(--text-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(10px);
+    }
+
+    .tag-pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(0, 200, 83, 0.7);
+    }
+
+    .header-kpi {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .header-kpi strong {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+      gap: 12px;
+      padding: 10px 10px 14px;
+      min-height: 0;
+      flex: 1;
+    }
+
+    @media (max-width: 880px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .panel {
+      background: radial-gradient(circle at top, #151b26 0, #070a0f 60%);
+      border-radius: var(--card-radius);
+      border: 1px solid rgba(53, 64, 92, 0.85);
+      box-shadow: var(--shadow-soft);
+      padding: 12px 13px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at 0 0,
+        rgba(0, 200, 83, 0.07),
+        transparent 55%
+      );
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .panel-header {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .panel-header-kpi {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .panel-header-kpi span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .panel-header-kpi strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .chip {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(11, 17, 25, 0.9);
+      border: 1px solid rgba(80, 96, 128, 0.9);
+      color: var(--text-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .left-top-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .search-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .search-input-wrap input {
+      width: 100%;
+      padding: 8px 30px 8px 24px;
+      border-radius: 999px;
+      border: 1px solid rgba(71, 85, 115, 0.9);
+      background: rgba(5, 9, 16, 0.9);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background var(--transition-fast);
+    }
+
+    .search-input-wrap input::placeholder {
+      color: rgba(148, 163, 184, 0.7);
+    }
+
+    .search-input-wrap input:focus {
+      border-color: rgba(0, 200, 83, 0.9);
+      box-shadow: 0 0 0 1px rgba(0, 200, 83, 0.25);
+      background: rgba(5, 9, 16, 0.98);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.3);
+    }
+
+    .search-icon::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      border: 1.6px solid #02130a;
+    }
+
+    .search-icon::after {
+      content: "";
+      position: absolute;
+      width: 6px;
+      height: 2px;
+      border-radius: 999px;
+      background: #02130a;
+      transform-origin: left center;
+      transform: translate(5px, 3px) rotate(45deg);
+    }
+
+    .search-shortcuts {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .kbd {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 6px;
+      border: 1px solid rgba(71, 85, 105, 0.9);
+      padding: 1px 6px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(148, 163, 184, 0.9);
+    }
+
+    .scan-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .scan-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 12px;
+      padding: 6px 12px;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background var(--transition-fast),
+        border-color var(--transition-fast),
+        color var(--transition-fast),
+        transform 0.08s ease-out,
+        box-shadow 0.08s ease-out;
+      outline: none;
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+      box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      color: #02150a;
+      border-color: rgba(34, 197, 94, 0.3);
+      box-shadow: 0 10px 24px rgba(34, 197, 94, 0.45);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.05);
+      box-shadow: 0 12px 26px rgba(34, 197, 94, 0.6);
+    }
+
+    .btn-ghost {
+      background: rgba(15, 23, 42, 0.9);
+      border-color: rgba(51, 65, 85, 0.9);
+      color: var(--text-soft);
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(148, 163, 184, 0.9);
+      background: rgba(15, 23, 42, 0.98);
+    }
+
+    .btn-danger {
+      background: rgba(127, 29, 29, 0.85);
+      border-color: rgba(248, 113, 113, 0.8);
+      color: #fee2e2;
+    }
+
+    .btn-danger:hover {
+      background: rgba(185, 28, 28, 0.95);
+    }
+
+    .btn-icon {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border-radius: 999px;
+    }
+
+    .btn-icon-circle {
+      width: 26px;
+      height: 26px;
+    }
+
+    .btn-icon-inner {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 2px solid #022c12;
+      box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.7);
+      background: radial-gradient(circle at 30% 30%, #bbf7d0, #4ade80);
+      position: relative;
+    }
+
+    .btn-icon-inner::after {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border-radius: inherit;
+      border: 1px solid rgba(5, 46, 22, 0.7);
+    }
+
+    .scan-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-soft);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .scan-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(71, 85, 105, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .scan-led {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--danger);
+      box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.7);
+    }
+
+    .scan-led.on {
+      background: var(--accent);
+      box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.9);
+    }
+
+    .scan-hint {
+      font-size: 10px;
+      color: rgba(148, 163, 184, 0.9);
+    }
+
+    .scan-container {
+      position: relative;
+      background: radial-gradient(circle at 50% 0, #020617 0, #020617 55%);
+      border-radius: 12px;
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      overflow: hidden;
+      padding: 10px 10px 8px;
+      margin-top: 4px;
+    }
+
+    .scan-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .scan-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .scan-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      color: var(--text-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .scan-camera-info {
+      font-size: 10px;
+      color: rgba(148, 163, 184, 0.9);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .scan-camera-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #a5b4fc, #6366f1);
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.7);
+    }
+
+    .scan-camera-info span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(51, 65, 85, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    #qr-reader {
+      width: 100%;
+      max-width: 380px;
+      margin: 0 auto;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #020617;
+      position: relative;
+      box-shadow: 0 16px 30px rgba(15, 23, 42, 0.9);
+    }
+
+    #qr-reader__scan_region {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    #qr-reader__dashboard {
+      border-top: 1px solid rgba(30, 64, 175, 0.85);
+      background: rgba(15, 23, 42, 0.96);
+      padding: 6px 8px !important;
+    }
+
+    .scan-guides {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .scan-guides-inner {
+      position: absolute;
+      inset: 18%;
+      border-radius: 12px;
+      border: 1px dashed rgba(96, 165, 250, 0.8);
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.85);
+    }
+
+    .scan-guides-inner::before,
+    .scan-guides-inner::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 1px solid transparent;
+      border-top-color: rgba(56, 189, 248, 0.9);
+      border-bottom-color: rgba(34, 197, 94, 0.9);
+      opacity: 0.85;
+    }
+
+    .scan-guides-inner::before {
+      clip-path: polygon(0 0, 36% 0, 64% 0, 100% 0, 100% 36%, 100% 64%, 100% 100%, 64% 100%, 36% 100%, 0 100%, 0 64%, 0 36%);
+    }
+
+    .scan-guides-inner::after {
+      border-width: 2px;
+      clip-path: polygon(0 0, 18% 0, 82% 0, 100 0, 100% 18%, 100% 82%, 100% 100%, 82% 100%, 18% 100%, 0 100%, 0 82%, 0 18%);
+      opacity: 0.5;
+    }
+
+    .scan-laser {
+      position: absolute;
+      left: 16%;
+      right: 16%;
+      top: 45%;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(34, 197, 94, 0.2),
+        rgba(34, 197, 94, 0.9),
+        rgba(34, 197, 94, 0.2),
+        transparent
+      );
+      box-shadow: 0 0 16px rgba(34, 197, 94, 0.9);
+      opacity: 0.85;
+      animation: scan-sweep 1.4s ease-in-out infinite;
+    }
+
+    @keyframes scan-sweep {
+      0% {
+        transform: translateY(-22px);
+        opacity: 0;
+      }
+      15% {
+        opacity: 0.85;
+      }
+      50% {
+        transform: translateY(0);
+        opacity: 0.95;
+      }
+      85% {
+        opacity: 0.85;
+      }
+      100% {
+        transform: translateY(22px);
+        opacity: 0;
+      }
+    }
+
+    #qr-reader__dashboard_section_csr span,
+    #qr-reader__status_span {
+      font-size: 11px !important;
+      color: rgba(148, 163, 184, 0.95) !important;
+    }
+
+    #qr-reader__dashboard button {
+      font-size: 11px !important;
+      border-radius: 999px !important;
+      padding: 4px 9px !important;
+      border: 1px solid rgba(51, 65, 85, 0.9) !important;
+      background: rgba(5, 13, 30, 0.95) !important;
+      color: rgba(226, 232, 240, 0.95) !important;
+    }
+
+    #qr-reader__dashboard button:hover {
+      border-color: rgba(148, 163, 184, 0.95) !important;
+      background: rgba(15, 23, 42, 0.98) !important;
+    }
+
+    .scan-tips {
+      margin-top: 8px;
+      font-size: 11px;
+      color: rgba(148, 163, 184, 0.9);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 12px;
+    }
+
+    .scan-tips span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scan-tips-bullet {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(129, 140, 248, 0.9);
+    }
+
+    .inventory-wrapper {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .inventory-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .inventory-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-soft);
+      align-items: center;
+    }
+
+    .filter-chip {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(71, 85, 105, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: border-color var(--transition-fast), background var(--transition-fast),
+        color var(--transition-fast), transform 0.06s ease-out;
+    }
+
+    .filter-chip.active {
+      border-color: rgba(52, 211, 153, 0.9);
+      background: rgba(6, 78, 59, 0.95);
+      color: #a7f3d0;
+    }
+
+    .filter-chip:active {
+      transform: scale(0.96);
+    }
+
+    .inventory-summary {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .inventory-summary span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .inventory-summary strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .inventory-table-wrapper {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      border-radius: 10px;
+      border: 1px solid rgba(30, 64, 175, 0.75);
+      background: radial-gradient(circle at top, #020617 0, #020617 45%, #020617 100%);
+      box-shadow: 0 16px 30px rgba(15, 23, 42, 0.9);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    thead {
+      background: rgba(15, 23, 42, 0.98);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    th,
+    td {
+      padding: 7px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+      white-space: nowrap;
+    }
+
+    th {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(148, 163, 184, 0.95);
+      border-bottom-color: rgba(30, 64, 175, 0.95);
+      background: rgba(15, 23, 42, 0.98);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    tbody tr:nth-child(odd) {
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    tbody tr:hover {
+      background: rgba(22, 101, 52, 0.35);
+    }
+
+    td.code-cell {
+      font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      color: rgba(148, 163, 184, 0.95);
+    }
+
+    td.name-cell {
+      font-weight: 500;
+      color: rgba(226, 232, 240, 0.98);
+    }
+
+    td.badge-cell span {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      color: rgba(148, 163, 184, 0.95);
+    }
+
+    .qty-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      background: rgba(15, 23, 42, 0.98);
+      font-size: 11px;
+      color: rgba(226, 232, 240, 0.95);
+    }
+
+    .qty-pill.low {
+      border-color: rgba(248, 113, 113, 0.9);
+      background: rgba(127, 29, 29, 0.9);
+      color: #fee2e2;
+    }
+
+    .actions-cell {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .btn-qty {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      background: rgba(15, 23, 42, 0.98);
+      color: rgba(226, 232, 240, 0.95);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background var(--transition-fast),
+        border-color var(--transition-fast),
+        transform 0.06s ease-out,
+        box-shadow 0.06s ease-out;
+    }
+
+    .btn-qty:hover {
+      border-color: rgba(148, 163, 184, 0.95);
+      background: rgba(17, 24, 39, 0.98);
+    }
+
+    .btn-qty:active {
+      transform: scale(0.94);
+      box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    }
+
+    .btn-qty.plus {
+      border-color: rgba(52, 211, 153, 0.9);
+      background: rgba(6, 78, 59, 0.95);
+      color: #a7f3d0;
+    }
+
+    .btn-qty.plus:hover {
+      background: rgba(5, 46, 22, 0.98);
+    }
+
+    .btn-qty.minus {
+      border-color: rgba(248, 113, 113, 0.9);
+      background: rgba(127, 29, 29, 0.95);
+      color: #fee2e2;
+    }
+
+    .btn-qty.minus:hover {
+      background: rgba(153, 27, 27, 0.98);
+    }
+
+    .right-panel-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .current-item-card {
+      border-radius: 12px;
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      background: radial-gradient(circle at top, #022c22 0, #020617 55%);
+      padding: 10px;
+      box-shadow: 0 14px 32px rgba(6, 95, 70, 0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .current-item-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: rgba(45, 212, 191, 0.9);
+      margin-bottom: 4px;
+    }
+
+    .current-item-main-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .current-item-main-info {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .current-item-name {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .current-item-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 11px;
+      color: rgba(148, 163, 184, 0.95);
+      margin-bottom: 6px;
+    }
+
+    .current-item-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .current-item-code {
+      font-family: ui-monospace, SF Mono, Menlo, Consolas, monospace;
+      letter-spacing: 0.08em;
+      font-size: 11px;
+      color: #bbf7d0;
+    }
+
+    .current-item-qty-block {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      min-width: 135px;
+    }
+
+    .current-item-qty-label {
+      font-size: 11px;
+      color: rgba(148, 163, 184, 0.95);
+    }
+
+    .current-item-qty-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #a7f3d0;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .current-item-qty-value span {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(148, 163, 184, 0.95);
+    }
+
+    .current-item-qty-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .current-item-footer {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: rgba(148, 163, 184, 0.95);
+      flex-wrap: wrap;
+    }
+
+    .current-item-footer span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .current-item-footer-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(45, 212, 191, 0.85);
+    }
+
+    .form-card {
+      border-radius: 12px;
+      border: 1px solid rgba(30, 64, 175, 0.8);
+      background: radial-gradient(circle at top, #020617 0, #020617 55%);
+      padding: 10px;
+      box-shadow: 0 16px 30px rgba(15, 23, 42, 0.9);
+    }
+
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .form-title {
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: rgba(148, 163, 184, 0.95);
+    }
+
+    .form-body {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 8px;
+    }
+
+    @media (max-width: 520px) {
+      .form-body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .field label {
+      font-size: 11px;
+      color: rgba(148, 163, 184, 0.95);
+    }
+
+    .field input,
+    .field textarea {
+      border-radius: 9px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      background: rgba(15, 23, 42, 0.98);
+      color: rgba(226, 232, 240, 0.98);
+      font-size: 12px;
+      padding: 6px 8px;
+      outline: none;
+      resize: vertical;
+      min-height: 30px;
+      transition: border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background var(--transition-fast);
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: rgba(100, 116, 139, 0.9);
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: rgba(59, 130, 246, 0.9);
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.4);
+      background: rgba(15, 23, 42, 0.98);
+    }
+
+    .field-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .field-inline input {
+      flex: 1;
+      min-width: 80px;
+    }
+
+    .field-note {
+      font-size: 10px;
+      color: rgba(148, 163, 184, 0.9);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      padding: 6px 14px 10px;
+      border-top: 1px solid rgba(30, 64, 175, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 10px;
+      color: var(--text-soft);
+      flex-wrap: wrap;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .footer-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .footer-dot-green {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.7);
+    }
+
+    .footer-dot-blue {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #60a5fa;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.7);
+    }
+
+    .footer-link {
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 2px;
+      color: rgba(148, 163, 184, 0.95);
+      cursor: default;
+    }
+  </style>
+  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="brand">
+        <div class="brand-logo">Q</div>
+        <div class="brand-text">
+          <div class="brand-text-title">STOCK ATELIER</div>
+          <div class="brand-text-sub">INVENTAIRE PAR QR CODE</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="tag-pill">
+          <span class="tag-pill-dot"></span>
+          <span>Mode atelier &middot; Offline‑first</span>
+        </div>
+        <div class="header-kpi">
+          <span>Total références&nbsp;<strong id="kpiTotalItems">0</strong></span>
+          <span>Stock total&nbsp;<strong id="kpiTotalQty">0</strong></span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Inventaire atelier</div>
+          <div class="panel-header-kpi">
+            <span><span class="chip-dot"></span> Dernière maj&nbsp;<span id="lastUpdateLabel">–</span></span>
+            <span class="chip">QR & code‑barres</span>
+          </div>
+        </div>
+
+        <div class="left-top-row">
+          <div class="search-row">
+            <div class="search-input-wrap">
+              <div class="search-icon"></div>
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="Rechercher par code, nom, emplacement…"
+              />
+            </div>
+            <div class="search-shortcuts">
+              <span>Filtres rapides :</span>
+              <button type="button" class="filter-chip" data-filter="all">Tous</button>
+              <button type="button" class="filter-chip" data-filter="low">Sous seuil</button>
+              <button type="button" class="filter-chip" data-filter="epi">EPI</button>
+              <span class="kbd">Ctrl+F</span>
+            </div>
+          </div>
+
+          <div class="scan-row">
+            <div class="scan-actions">
+              <button type="button" class="btn btn-primary" id="startScanBtn">
+                <span class="btn-icon-inner"></span> Scanner un QR / code‑barres
+              </button>
+              <button type="button" class="btn btn-ghost" id="stopScanBtn">
+                Arrêter le scan
+              </button>
+              <button type="button" class="btn btn-ghost" id="clearSearchBtn">
+                Effacer la recherche
+              </button>
+            </div>
+            <div class="scan-status">
+              <div class="scan-status-pill">
+                <span class="scan-led" id="scanLed"></span>
+                <span id="scanStatusLabel">Scan en pause</span>
+              </div>
+              <span class="scan-hint">Astuce : privilégier la caméra arrière, garder 10‑15 cm de distance.</span>
+            </div>
+          </div>
+
+          <div class="scan-container">
+            <div class="scan-header-row">
+              <div class="scan-title-group">
+                <span class="scan-badge">Zone de scan optimisée</span>
+              </div>
+              <div class="scan-camera-info">
+                <span><span class="scan-camera-dot"></span>Caméra arrière forcée</span>
+                <span>QR 10×10 mm, distance 10–15 cm</span>
+              </div>
+            </div>
+            <div id="qr-reader"></div>
+            <div class="scan-guides">
+              <div class="scan-guides-inner"></div>
+              <div class="scan-laser"></div>
+            </div>
+            <div class="scan-tips">
+              <span><span class="scan-tips-bullet"></span>Garder le QR net dans le carré, sans coller la caméra.</span>
+              <span><span class="scan-tips-bullet"></span>Éviter les reflets sur les sachets plastiques.</span>
+              <span><span class="scan-tips-bullet"></span>Si besoin, utiliser un pistolet scanner (mode clavier).</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="inventory-wrapper">
+          <div class="inventory-header-row">
+            <div class="inventory-filters">
+              <span>Vue :</span>
+              <button type="button" class="filter-chip active" data-view="list">Liste</button>
+              <button type="button" class="filter-chip" data-view="compact">Compact</button>
+            </div>
+            <div class="inventory-summary">
+              <span>Références&nbsp;<strong id="summaryItems">0</strong></span>
+              <span>Stock total&nbsp;<strong id="summaryQty">0</strong></span>
+              <span>
+                Sous seuil
+                <strong id="summaryLow">0</strong>
+              </span>
+            </div>
+          </div>
+
+          <div class="inventory-table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Désignation</th>
+                  <th>Emplacement</th>
+                  <th>Qté</th>
+                  <th>Seuil</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Détail & mouvements</div>
+          <div class="panel-header-kpi">
+            <span>
+              <span class="chip-dot"></span>
+              Pistolet scanner =&nbsp;champ code
+            </span>
+          </div>
+        </div>
+
+        <div class="right-panel-body">
+          <div class="current-item-card" id="currentItemCard">
+            <div class="current-item-label">Référence sélectionnée</div>
+            <div class="current-item-main-row">
+              <div class="current-item-main-info">
+                <div class="current-item-name" id="currentItemName">
+                  Aucune référence sélectionnée
+                </div>
+                <div class="current-item-meta">
+                  <span>
+                    Code :
+                    <span class="current-item-code" id="currentItemCode">–</span>
+                  </span>
+                  <span>
+                    Emplacement :
+                    <span id="currentItemLocation">–</span>
+                  </span>
+                </div>
+              </div>
+              <div class="current-item-qty-block">
+                <div class="current-item-qty-label">Quantité en stock</div>
+                <div class="current-item-qty-value">
+                  <span id="currentItemQty">0</span><span>pièces</span>
+                </div>
+                <div class="current-item-qty-actions">
+                  <button type="button" class="btn-qty minus" id="currentMinusBtn">−</button>
+                  <button type="button" class="btn-qty plus" id="currentPlusBtn">+</button>
+                  <button type="button" class="btn btn-ghost" id="setExactBtn">
+                    Définir une quantité
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="current-item-footer">
+              <span>
+                <span class="current-item-footer-dot"></span>
+                Mise à jour rapide via scan de QR ou pistolet scanner.
+              </span>
+              <span>Chaque scan sélectionne automatiquement la référence.</span>
+            </div>
+          </div>
+
+          <div class="form-card">
+            <div class="form-header">
+              <div class="form-title">Créer / modifier une référence</div>
+              <button type="button" class="btn btn-ghost btn-icon-circle" id="resetFormBtn">
+                ✕
+              </button>
+            </div>
+            <div class="form-body">
+              <div class="field-group">
+                <div class="field">
+                  <label for="codeInput">Code (QR / code‑barres)</label>
+                  <div class="field-inline">
+                    <input
+                      type="text"
+                      id="codeInput"
+                      placeholder="Ex. REF-0001 ou code lu par scan"
+                    />
+                  </div>
+                  <div class="field-note">
+                    Pistolet scanner : placer le curseur ici, puis scanner.
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="nameInput">Désignation</label>
+                  <input
+                    type="text"
+                    id="nameInput"
+                    placeholder="Ex. Vis M6x20 zinguée"
+                  />
+                </div>
+                <div class="field">
+                  <label for="locationInput">Emplacement</label>
+                  <input
+                    type="text"
+                    id="locationInput"
+                    placeholder="Ex. R1‑BAC1, EPI‑AR1…"
+                  />
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field">
+                  <label for="qtyInput">Quantité</label>
+                  <input type="number" id="qtyInput" min="0" step="1" value="0" />
+                </div>
+                <div class="field">
+                  <label for="minQtyInput">Seuil minimum</label>
+                  <input type="number" id="minQtyInput" min="0" step="1" value="0" />
+                  <div class="field-note">
+                    Quand le stock passe en dessous, la ligne apparaît en rouge.
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="noteInput">Note interne</label>
+                  <textarea
+                    id="noteInput"
+                    rows="2"
+                    placeholder="Conditionnements, fournisseur, fréquence de consommation…"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-ghost" id="deleteItemBtn">
+                Supprimer
+              </button>
+              <button type="button" class="btn btn-primary" id="saveItemBtn">
+                Enregistrer / mettre à jour
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-left">
+        <div class="footer-pill">
+          <span class="footer-dot-green"></span>
+          <span>Inventaire stock atelier &middot; QR 10×10 mm &middot; Mode sombre industriel</span>
+        </div>
+      </div>
+      <div class="footer-rig
